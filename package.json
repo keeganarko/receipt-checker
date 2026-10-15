@@ -1,0 +1,29 @@
+{
+  "name": "receipt-checker",
+  "version": "0.1.0",
+  "description": "Checks an AI agent's \"done\" receipt by rerunning its checks from the exact commit in a clean copy, and refuses any claim that does not reproduce.",
+  "author": "Keegan Choudhury",
+  "homepage": "https://github.com/keeganarko/receipt-checker#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keeganarko/receipt-checker.git"
+  },
+  "license": "SEE LICENSE IN LICENSE.md",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "receipt-check": "bin/receipt-check.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}
