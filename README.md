@@ -409,11 +409,17 @@ On 2026-10-15:
   - an edited, removed or reordered ledger line is found.
 - The suite also passes in an empty environment (`env -i` with only `PATH`),
   the way `receipt-check` runs a check.
-- `--offline` ran the checks with no network on WSL2, where unprivileged user
-  namespaces work.
-- CI runs the tests on Ubuntu with Node.js 20, 22 and 24 and on macOS with
-  Node.js 24, prints the test counts, and verifies every receipt in
-  `receipts/`.
+- CI passed at the v0.1.0 commit on Ubuntu with Node.js 20, 22 and 24 and on
+  macOS with Node.js 24
+  ([run 38793284389](https://github.com/keeganarko/receipt-checker/actions/runs/38793284389)).
+  All four counted the same 154 leaf tests: 154 passed, 0 failed, 0 skipped.
+- `--offline` ran the checks with no network on WSL2. The CI runners can't
+  make the network namespace it needs (Ubuntu blocks unprivileged user
+  namespaces, and macOS has none), and there the tests confirmed that the
+  verdict is INCOMPLETE rather than a run with the network.
+- [receipts/v0.1.0.json](receipts/v0.1.0.json) is the release receipt for the
+  commit tagged v0.1.0. `receipt-check verify receipts/v0.1.0.json` says
+  VERIFIED locally, and CI runs the same check on every push.
 
 ## License
 

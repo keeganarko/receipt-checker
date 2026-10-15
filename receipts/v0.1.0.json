@@ -1,0 +1,33 @@
+{
+  "receipt": "receipt-check/1",
+  "status": "PASS",
+  "commit": "50e4226d85b2d913991e5b17a7e62ed41f875709",
+  "checks": [
+    {
+      "id": "tests",
+      "run": "node --test --test-reporter=tap test/*.test.js",
+      "format": "tap",
+      "counts": { "passed": 154, "failed": 0, "skipped": 0 },
+      "timeout_seconds": 900
+    },
+    { "id": "version", "run": "node bin/receipt-check.js --help | grep -F 'receipt-check 0.1.0:'" },
+    { "id": "example", "run": "node bin/receipt-check.js lint examples/receipt.json" },
+    { "id": "no-dependencies", "run": "! grep -q '\"dependencies\"' package.json" }
+  ],
+  "delivered": [
+    "bin/receipt-check.js",
+    "package.json",
+    "LICENSE.md",
+    "README.md",
+    "README.html",
+    "examples/receipt.json",
+    ".github/workflows/ci.yml"
+  ],
+  "done_when": [
+    { "id": "tests-pass", "text": "npm test passes, with end-to-end runs in real temporary git repositories", "check": "tests" },
+    { "id": "version", "text": "the command reports version 0.1.0", "check": "version" },
+    { "id": "example-valid", "text": "the example receipt is a valid receipt-check/1 receipt", "check": "example" },
+    { "id": "no-dependencies", "text": "it has no runtime dependencies", "check": "no-dependencies" }
+  ],
+  "note": "The release receipt for receipt-checker v0.1.0, the commit tagged v0.1.0. CI verifies it on every push with: node bin/receipt-check.js verify receipts/v0.1.0.json"
+}
