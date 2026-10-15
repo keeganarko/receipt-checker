@@ -1,0 +1,24 @@
+{
+  "receipt": "receipt-check/1",
+  "status": "PASS",
+  "commit": "0123456789abcdef0123456789abcdef01234567",
+  "checks": [
+    {
+      "id": "tests",
+      "run": "node --test --test-reporter=tap",
+      "format": "tap",
+      "counts": { "passed": 10, "failed": 0, "skipped": 0 },
+      "timeout_seconds": 300
+    },
+    {
+      "id": "lint",
+      "run": "npm run lint"
+    }
+  ],
+  "delivered": ["src/parser.js", "test/parser.test.js"],
+  "done_when": [
+    { "id": "r1", "text": "the parser tests pass", "check": "tests" },
+    { "id": "r2", "text": "the code is lint-clean", "check": "lint" }
+  ],
+  "note": "An example: the commit id is made up, so verify refutes it. lint passes."
+}

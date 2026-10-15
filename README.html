@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>receipt-checker</title>
+<meta name="description" content="receipt-check reruns an AI agent's proof of done from the exact commit, in a clean copy, and refuses the claim unless it reproduces.">
+<style>
+:root{--bg:#ffffff;--ink:#14161a;--muted:#5b616b;--line:#e3e6ea;--soft:#f5f6f8;--code:#f0f2f5;--good:#0b7a3e;--good-bg:#e8f5ee;--bad:#b42318;--bad-bg:#fdecea;--wait:#8a5a00;--wait-bg:#fdf3dd}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#101215;--ink:#f2f3f5;--muted:#a1a7b0;--line:#2c3036;--soft:#181b1f;--code:#1d2126;--good:#5ad08c;--good-bg:#12291c;--bad:#ff8a7a;--bad-bg:#331714;--wait:#f2c45a;--wait-bg:#2e2410}}
+:root[data-theme="dark"]{--bg:#101215;--ink:#f2f3f5;--muted:#a1a7b0;--line:#2c3036;--soft:#181b1f;--code:#1d2126;--good:#5ad08c;--good-bg:#12291c;--bad:#ff8a7a;--bad-bg:#331714;--wait:#f2c45a;--wait-bg:#2e2410}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:40px 16px 56px}
+h1{font-size:2.2rem;line-height:1.15;margin:0 0 12px;letter-spacing:-.01em}
+h2{font-size:1.3rem;margin:0 0 14px}
+h3{font-size:1rem;margin:0 0 6px}
+p{margin:0 0 10px}
+a{color:inherit}
+code,pre{font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--code);padding:1px 5px;border-radius:5px}
+.lead{font-size:1.25rem;line-height:1.45;margin-bottom:8px}
+.sub{color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chips a,.chips span{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.9rem;text-decoration:none;background:var(--soft)}
+section{margin-top:40px;break-inside:avoid}
+.flow{list-style:none;counter-reset:step;padding:0;margin:0 0 14px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.flow li{counter-increment:step;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px;position:relative}
+.flow li::before{content:counter(step);display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:.8rem;font-weight:700;margin-bottom:6px}
+.flow b{display:block;margin-bottom:2px}
+.flow span{color:var(--muted);font-size:.9rem}
+.verdicts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.verdict{border-radius:12px;padding:14px;border:1px solid var(--line)}
+.verdict b{display:block;font-size:1.05rem;margin-bottom:4px}
+.verdict small{display:block;margin-top:6px;color:var(--muted)}
+.ok{background:var(--good-bg);border-color:var(--good)}.ok b{color:var(--good)}
+.no{background:var(--bad-bg);border-color:var(--bad)}.no b{color:var(--bad)}
+.wait{background:var(--wait-bg);border-color:var(--wait)}.wait b{color:var(--wait)}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--bg);break-inside:avoid}
+.card p{color:var(--muted);font-size:.95rem;margin:0}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.04em;border-radius:6px;padding:1px 7px;margin-bottom:6px}
+.tag.no{color:var(--bad)}.tag.wait{color:var(--wait)}.tag.ok{color:var(--good)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:14px}
+.stat b{display:block;font-size:1.8rem;line-height:1.1}
+.stat span{color:var(--muted);font-size:.9rem}
+.receipt{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+pre{margin:0;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto;white-space:pre}
+.notes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.notes li{border-left:3px solid var(--line);padding:2px 0 2px 10px}
+.notes b{display:block}
+.notes span{color:var(--muted);font-size:.92rem}
+.chain{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin:6px 0 12px}
+.link{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft);min-width:150px}
+.link b{display:block}
+.link span{color:var(--muted);font-size:.85rem}
+.arrow{align-self:center;padding:0 8px;color:var(--muted)}
+.link.broken{border-color:var(--bad);background:var(--bad-bg)}
+.link.broken b{color:var(--bad)}
+.warn{border:1px solid var(--wait);background:var(--wait-bg);border-radius:14px;padding:18px}
+.warn ul{margin:0;padding-left:20px}
+.warn li{margin-bottom:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two div{border:1px solid var(--line);border-radius:12px;padding:14px}
+.two ul{margin:0;padding-left:20px}
+.foot{margin-top:40px;color:var(--muted);font-size:.9rem}
+@media (max-width:760px){.flow{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.flow,.verdicts,.cards,.receipt,.two{grid-template-columns:1fr}h1{font-size:1.8rem}.chain{flex-direction:column}.arrow{transform:rotate(90deg);padding:4px 0}}
+@page{size:A4;margin:14mm}
+@media print{body{background:#fff;color:#000;font-size:10pt}main{max-width:none;padding:0}section{margin-top:16px}.flow{grid-template-columns:repeat(5,1fr)}.stats{grid-template-columns:repeat(4,1fr)}.cards{grid-template-columns:repeat(3,1fr)}h1{font-size:1.8rem}.lead{font-size:1.1rem}.flow li,.verdict,.card,.stat,.warn,.two div,pre,.link{break-inside:avoid}a{text-decoration:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>receipt-checker</h1>
+  <p class="lead">When an AI agent says “done, all tests pass”, this reruns the proof from the exact commit, in a clean copy. If the proof doesn’t come out the same, the claim is refused.</p>
+  <p class="sub">A small command, <code>receipt-check</code>. Linux and macOS, Node.js 20 or later, no dependencies.</p>
+  <div class="chips"><a href="README.md">Full details: README.md</a><a href="LICENSE.md">Licence: FSL-1.1-MIT</a><span>Version 0.1.0</span></div>
+
+  <section>
+    <h2>What happens when you check a receipt</h2>
+    <ol class="flow">
+      <li><b>Read the receipt</b><span>Strictly. Every mistake is shown with its line.</span></li>
+      <li><b>Find the commit</b><span>The exact one it names. A branch name isn’t enough.</span></li>
+      <li><b>Copy only that commit</b><span>Into an empty folder: no stray files, no history.</span></li>
+      <li><b>Rerun every check</b><span>With a time limit and a clean environment.</span></li>
+      <li><b>Compare</b><span>What was claimed against what just happened.</span></li>
+    </ol>
+    <div class="verdicts">
+      <div class="verdict ok"><b>✓ VERIFIED</b>Everything came out the same.<small>exit 0</small></div>
+      <div class="verdict no"><b>✗ REFUTED</b>Something it claimed is false.<small>exit 1</small></div>
+      <div class="verdict wait"><b>? INCOMPLETE</b>Something couldn’t be checked, so it is not a pass.<small>exit 2</small></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The tricks it catches</h2>
+    <div class="cards">
+      <div class="card"><span class="tag no">REFUTED</span><h3>“It passes on my machine”</h3><p>The test needed a file that was never committed. The clean copy holds only the commit, so the test fails there.</p></div>
+      <div class="card"><span class="tag no">REFUTED</span><h3>“10 passed” when 9 ran</h3><p>It counts the tests itself, from the TAP or JUnit report the rerun writes.</p></div>
+      <div class="card"><span class="tag no">REFUTED</span><h3>A failure hidden in a pipe</h3><p>Every check runs in strict bash, so <code>false | cat</code> fails the way it should.</p></div>
+      <div class="card"><span class="tag no">REFUTED</span><h3>A commit that isn’t there</h3><p>The id it names has to exist in the repository.</p></div>
+      <div class="card"><span class="tag no">REFUTED</span><h3>A test hidden from the copy</h3><p>Files come straight from git, so <code>.gitattributes</code> can’t leave a failing test out.</p></div>
+      <div class="card"><span class="tag wait">INCOMPLETE</span><h3>A check that hangs, or leaves no report</h3><p>The time limit stops it and everything it started. Missing proof is never a pass.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>A receipt, in one picture</h2>
+    <div class="receipt">
+<pre>{
+  "receipt": "receipt-check/1",
+  "status": "PASS",
+  "commit": "3f2c…e91a",
+  "checks": [{
+    "id": "tests",
+    "run": "npm test",
+    "format": "tap",
+    "counts": { "passed": 10,
+                "failed": 0,
+                "skipped": 0 }
+  }],
+  "delivered": ["src/parser.js"],
+  "done_when": [{ "id": "r1",
+    "text": "the parser tests pass",
+    "check": "tests" }]
+}</pre>
+      <ul class="notes">
+        <li><b>Which commit</b><span>The full id, exactly as git prints it.</span></li>
+        <li><b>What to rerun</b><span>Each check is a shell command, rerun in the clean copy.</span></li>
+        <li><b>What it claims</b><span>How many tests passed, failed and were skipped.</span></li>
+        <li><b>What was delivered</b><span>Files that must exist at that commit.</span></li>
+        <li><b>What was promised</b><span>Each promise names the check that proves it.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tested on October 15, 2026</h2>
+    <div class="stats">
+      <div class="stat"><b>154</b><span>tests pass, in real throwaway git repositories</span></div>
+      <div class="stat"><b>4</b><span>CI setups: Node.js 20, 22 and 24 on Linux, 24 on macOS</span></div>
+      <div class="stat"><b>0</b><span>dependencies</span></div>
+      <div class="stat"><b>✓</b><span>it verifies its own v0.1.0 receipt, in CI too</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>An optional log that shows edits</h2>
+    <p>Each verdict can be added to a log. Every entry carries a fingerprint of the one before it, so changing an old entry breaks the chain right there.</p>
+    <div class="chain">
+      <div class="link"><b>Entry 1</b><span>VERIFIED</span></div><div class="arrow">→</div>
+      <div class="link broken"><b>Entry 2, edited</b><span>fingerprint no longer matches</span></div><div class="arrow">→</div>
+      <div class="link"><b>Entry 3</b><span>points at the old entry 2</span></div>
+    </div>
+    <p class="sub">It shows tampering; it can’t prevent it. Someone who can write the file can rewrite the whole chain, so keep the latest fingerprint somewhere they can’t.</p>
+  </section>
+
+  <section class="warn">
+    <h2>Know this before you run it</h2>
+    <ul>
+      <li><b>It runs the commands in the receipt.</b> The clean copy is not a sandbox. Read a receipt before you check it, as you would a script.</li>
+      <li><b>A check proves only what it tests.</b> A receipt whose only check is <code>true</code> passes.</li>
+      <li><b>Checks have the network</b> unless you ask for <code>--offline</code>, which works on Linux only. Elsewhere it says INCOMPLETE instead of quietly running online.</li>
+      <li><b>Linux and macOS only.</b> It doesn’t run on Windows.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>The licence in plain words</h2>
+    <div class="two">
+      <div><h3>You can</h3><ul><li>Read, use, change and share it</li><li>Use it at work, for any purpose but one</li><li>Use each version under MIT, two years after its release</li></ul></div>
+      <div><h3>You can’t</h3><ul><li>Offer it, or something substantially like it, as a competing commercial product or service</li><li>Call it open source: it is source-available (FSL-1.1-MIT)</li></ul></div>
+    </div>
+  </section>
+
+  <p class="foot">The full description, the receipt format, exit codes and limits are in README.md. LICENSE.md has the terms that apply.</p>
+</main>
+</body>
+</html>
