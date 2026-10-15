@@ -1,0 +1,36 @@
+TAP version 13
+# Subtest: outer
+    # Subtest: inner
+        # Subtest: leaf
+        ok 1 - leaf
+          ---
+          duration_ms: 0.380102
+          type: 'test'
+          ...
+        1..1
+    ok 1 - inner
+      ---
+      duration_ms: 0.906355
+      type: 'suite'
+      ...
+    # Subtest: after
+    ok 2 - after
+      ---
+      duration_ms: 0.117396
+      type: 'test'
+      ...
+    1..2
+ok 1 - outer
+  ---
+  duration_ms: 1.364765
+  type: 'suite'
+  ...
+1..1
+# tests 2
+# suites 2
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 45.372219

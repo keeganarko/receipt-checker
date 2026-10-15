@@ -1,0 +1,16 @@
+import { describe, it, test } from 'node:test';
+
+describe('math', () => {
+  it('adds', () => {});
+  it('subtracts', () => {});
+  it.skip('divides by zero', () => {});
+  describe('nested', () => {
+    it('multiplies', () => {});
+  });
+});
+
+test('top level', async (t) => {
+  await t.test('child', () => {});
+});
+
+it.todo('later', () => {});

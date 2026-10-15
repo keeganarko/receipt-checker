@@ -69,9 +69,11 @@ export function parseTap(text) {
     if (indent % 4 !== 0) return problem(`${at}: a ${test ? 'test' : 'plan'} line indented by ${indent} spaces; subtests are indented in steps of 4`);
     const depth = indent / 4;
     let top = stack[stack.length - 1];
-    if (depth > top.depth) {
-      if (depth > top.depth + 1) return problem(`${at}: indented ${depth - top.depth} levels deeper than the block it is in`);
-      top = block(depth);
+    // A block whose first child is itself a block opens two or more levels
+    // at once (describe() > describe() > it() in Node's output). Each level
+    // opened here must still close with its own plan and test line.
+    while (top.depth < depth) {
+      top = block(top.depth + 1);
       stack.push(top);
     }
     let children = null;

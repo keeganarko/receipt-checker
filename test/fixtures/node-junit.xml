@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testsuite name="math" time="0.002458" disabled="0" errors="0" tests="4" failures="0" skipped="1" timestamp="2026-10-15T03:45:17.025Z" hostname="host">
+		<testcase name="adds" time="0.000517" classname="test" file="/work/sample.test.mjs"/>
+		<testcase name="subtracts" time="0.000134" classname="test" file="/work/sample.test.mjs"/>
+		<testcase name="divides by zero" time="0.000080" classname="test" file="/work/sample.test.mjs">
+			<skipped type="skipped" message="true"/>
+		</testcase>
+		<testsuite name="nested" time="0.000938" disabled="0" errors="0" tests="1" failures="0" skipped="0" timestamp="2026-10-15T03:45:17.027Z" hostname="host">
+			<testcase name="multiplies" time="0.000800" classname="test" file="/work/sample.test.mjs"/>
+		</testsuite>
+	</testsuite>
+	<testsuite name="top level" time="0.000374" disabled="0" errors="0" tests="1" failures="0" skipped="0" timestamp="2026-10-15T03:45:17.028Z" hostname="host">
+		<testcase name="child" time="0.000130" classname="test" file="/work/sample.test.mjs"/>
+	</testsuite>
+	<testcase name="later" time="0.000140" classname="test" file="/work/sample.test.mjs">
+		<skipped type="todo" message="true"/>
+	</testcase>
+	<!-- tests 7 -->
+	<!-- suites 2 -->
+	<!-- pass 5 -->
+	<!-- fail 0 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 1 -->
+	<!-- todo 1 -->
+	<!-- duration_ms 51.847678 -->
+</testsuites>

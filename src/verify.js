@@ -18,6 +18,21 @@ const REPORT_LIMIT = 64 * 1024 * 1024;
 const TAIL_BYTES = 4096;
 const EVIDENCE = { tap: 'TAP output', junit: 'JUnit report' };
 
+// Clean copies that exist right now, so a signal handler can remove them:
+// process.exit() skips the finally block that normally does.
+const liveCopies = new Set();
+
+export function removeLiveCopies() {
+  for (const dir of liveCopies) {
+    try {
+      removeTree(dir);
+    } catch {
+      // exiting anyway; the folder is left in the temp directory
+    }
+  }
+  liveCopies.clear();
+}
+
 export class SetupError extends Error {}
 
 export function verdictOf(findings) {
@@ -62,10 +77,14 @@ export async function verifyReceipt(receipt, { repo, offline = false, keep = fal
         result.delivered.push({ path: p, present: present[n] });
         if (!present[n]) note('refutes', 'delivered-missing', `delivered path ${p} does not exist at ${short}`, { path: p });
       });
-      if (present.every(Boolean)) note('ok', 'delivered-present', `all ${present.length} delivered paths exist at ${short}`);
+      if (present.every(Boolean)) {
+        const which = present.length === 1 ? 'the 1 delivered path exists' : `all ${present.length} delivered paths exist`;
+        note('ok', 'delivered-present', `${which} at ${short}`);
+      }
     }
 
     const work = fs.mkdtempSync(path.join(os.tmpdir(), 'receipt-check-'));
+    if (!keep) liveCopies.add(work);
     const copy = path.join(work, 'copy');
     const home = path.join(work, 'home');
     const tmp = path.join(work, 'tmp');
@@ -77,7 +96,7 @@ export async function verifyReceipt(receipt, { repo, offline = false, keep = fal
           fs.mkdirSync(home);
           fs.mkdirSync(tmp);
           result.copy = { files };
-          note('ok', 'copy-made', `exported ${files} files from ${short} into a clean copy: no .git, nothing uncommitted or untracked`);
+          note('ok', 'copy-made', `exported ${files} ${files === 1 ? 'file' : 'files'} from ${short} into a clean copy: no .git, nothing uncommitted or untracked`);
         } catch (error) {
           note('incomplete', 'copy-failed', `could not export ${short}: ${error.message}`);
           canRun = false;
@@ -93,7 +112,10 @@ export async function verifyReceipt(receipt, { repo, offline = false, keep = fal
       }
     } finally {
       if (keep) result.copy = { ...result.copy, kept: work };
-      else removeTree(work);
+      else {
+        removeTree(work);
+        liveCopies.delete(work);
+      }
     }
   }
 
@@ -157,7 +179,7 @@ function judgeCheck(check, run, copy, note) {
   out.outcome = effects.includes('refutes') ? 'failed' : effects.includes('incomplete') ? 'incomplete' : 'passed';
   if (out.outcome === 'passed') {
     const counted = out.counts ? `; ${EVIDENCE[check.format]} shows ${describeCounts(out.counts)}, as claimed` : '';
-    note('ok', 'check-passed', `${name} passed: exit 0 in ${out.seconds} s${counted}`, { check: check.id });
+    note('ok', 'check-passed', `${name} passed: exit 0 in ${out.seconds.toFixed(1)} s${counted}`, { check: check.id });
   }
   return out;
 }

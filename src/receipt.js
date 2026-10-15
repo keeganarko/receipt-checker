@@ -160,7 +160,7 @@ function validate(doc, problem) {
         if ('check' in item) {
           if (typeof item.check !== 'string') problem(joinPath(path, 'check'), `must name a check id as a string, not ${kindOf(item.check)}`);
           else if (checks.length && !checks.some((c) => c.id === item.check)) {
-            problem(joinPath(path, 'check'), `names check "${item.check}", but no check has that id (checks: ${checks.map((c) => c.id).join(', ')})`);
+            problem(joinPath(path, 'check'), `names check "${item.check}", but no check has that id (checks: ${[...new Set(checks.map((c) => c.id))].join(', ')})`);
           }
         }
         doneWhen.push({ id: item.id, text: item.text, check: item.check });
@@ -259,7 +259,8 @@ function validateCheck(item, path, status, problem) {
         if (!ENV_NAME.test(name)) problem(at, `"${name}" is not a usable environment variable name`, true);
         else if (typeof value !== 'string') problem(at, `must be a string, not ${kindOf(value)}`);
         else if (value.includes('\0')) problem(at, 'contains a NUL character');
-        else env[name] = value;
+        // defined, not assigned: assigning "__proto__" would set the prototype and drop the variable
+        else Object.defineProperty(env, name, { value, enumerable: true, writable: true, configurable: true });
       }
     }
   }
