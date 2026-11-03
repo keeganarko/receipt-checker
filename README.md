@@ -27,6 +27,14 @@ when a rerun that nothing outside the commit can touch produces the same
 evidence. When evidence is missing or can't be read, the answer is
 INCOMPLETE, never VERIFIED.
 
+`receipt-checker` is one of the source-available reliability primitives from
+[Agent Hub](https://www.keegan.ai/workspace/) (a 5-agent local control plane with
+82 shared tools and 8,738 tests), alongside
+[`compaction-guard`](https://github.com/keeganarko/compaction-guard) (SHA-256
+transcript verification before context compaction) and
+[`model-lab`](https://github.com/keeganarko/model-lab) (local LLM
+interpretability and activation steering).
+
 ## How it works
 
 ```mermaid
