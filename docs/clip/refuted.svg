@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="572" viewBox="0 0 920 572" role="img" aria-labelledby="title desc">
+  <title id="title">receipt-check refusing a PASS that only held because of an uncommitted file</title>
+  <desc id="desc">A sample terminal session, about 19 seconds long. An agent's test passes in its own checkout and it hands over a receipt that says PASS. receipt-check reruns the check from the exact commit in a clean copy and answers REFUTED: the check exits with 1 because config.json was never committed. git status confirms config.json is untracked.</desc>
+  <style>
+    text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 13.5px; fill: #c9d1d9; white-space: pre; }
+    .l { opacity: 0; animation: show 0.01s linear forwards; }
+    @keyframes show { to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .l { animation: none; opacity: 1; } }
+    .prompt { fill: #79c0ff; font-weight: 600; }
+    .cmd { fill: #f0f6fc; font-weight: 600; }
+    .comment { fill: #8b949e; font-style: italic; }
+    .dim, .quote { fill: #8b949e; }
+    .refuted { fill: #ff7b72; font-weight: 700; }
+    .bad { fill: #ff7b72; font-weight: 700; }
+    .ok { fill: #7ee787; font-weight: 700; }
+    .untracked { fill: #ffa657; }
+    .title, .foot { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 12.5px; fill: #8b949e; }
+  </style>
+  <rect x="0.5" y="0.5" width="919" height="571" rx="10" fill="#0d1117" stroke="#30363d"/>
+  <circle cx="22" cy="20" r="6" fill="#ff5f57"/>
+  <circle cx="42" cy="20" r="6" fill="#febc2e"/>
+  <circle cx="62" cy="20" r="6" fill="#28c840"/>
+  <text class="title" x="460" y="24" text-anchor="middle">receipt-check 0.1.0 · sample repository</text>
+  <line x1="0" y1="38" x2="920" y2="38" stroke="#30363d"/>
+  <text class="l comment" x="22" y="58" style="animation-delay:0.60s" xml:space="preserve"># An agent wrote a test, ran it, and it passed.</text>
+  <text class="l cmd" x="22" y="77" style="animation-delay:1.80s" xml:space="preserve"><tspan class="prompt">$ </tspan><tspan class="cmd">node --test config.test.mjs &gt; /dev/null &amp;&amp; echo "passes on my machine"</tspan></text>
+  <text class="l out" x="22" y="96" style="animation-delay:3.20s" xml:space="preserve">passes on my machine</text>
+  <text class="l comment" x="22" y="124" style="animation-delay:5.00s" xml:space="preserve"># So it hands over a receipt that says PASS:</text>
+  <text class="l cmd" x="22" y="143" style="animation-delay:6.20s" xml:space="preserve"><tspan class="prompt">$ </tspan><tspan class="cmd">cat receipt.json</tspan></text>
+  <text class="l out" x="22" y="162" style="animation-delay:6.70s" xml:space="preserve">{ "receipt": "receipt-check/1", "status": "PASS", "commit": "1de3eb9a73573cede484ffbf5bc053ac397ed751",</text>
+  <text class="l out" x="22" y="181" style="animation-delay:6.80s" xml:space="preserve">  "checks": [{ "id": "config", "run": "node --test config.test.mjs" }] }</text>
+  <text class="l cmd" x="22" y="200" style="animation-delay:9.20s" xml:space="preserve"><tspan class="prompt">$ </tspan><tspan class="cmd">receipt-check verify receipt.json</tspan></text>
+  <text class="l dim" x="22" y="219" style="animation-delay:9.80s" xml:space="preserve">receipt-check: exporting 1de3eb9a7357 into a clean copy</text>
+  <text class="l dim" x="22" y="238" style="animation-delay:10.70s" xml:space="preserve">receipt-check: running check "config" (limit 600 s): node --test config.test.mjs</text>
+  <text class="l refuted" x="22" y="257" style="animation-delay:12.30s" xml:space="preserve">REFUTED: 1 claim in receipt.json did not hold at 1de3eb9a7357</text>
+  <text class="l mark" x="22" y="276" style="animation-delay:12.65s" xml:space="preserve">  <tspan class="bad">✗</tspan> check "config" exited with 1</text>
+  <text class="l mark" x="22" y="295" style="animation-delay:13.00s" xml:space="preserve">  <tspan class="ok">✓</tspan> commit 1de3eb9a7357 exists</text>
+  <text class="l mark" x="22" y="314" style="animation-delay:13.35s" xml:space="preserve">  <tspan class="ok">✓</tspan> exported 1 file from 1de3eb9a7357 into a clean copy: no .git, nothing uncommitted or untracked</text>
+  <text class="l dim" x="22" y="333" style="animation-delay:13.70s" xml:space="preserve">  last lines of stdout from check "config":</text>
+  <text class="l quote" x="22" y="352" style="animation-delay:13.78s" xml:space="preserve">    | …</text>
+  <text class="l quote" x="22" y="371" style="animation-delay:13.86s" xml:space="preserve">    |     code: 'ENOENT',</text>
+  <text class="l quote" x="22" y="390" style="animation-delay:13.94s" xml:space="preserve">    |     syscall: 'open',</text>
+  <text class="l quote" x="22" y="409" style="animation-delay:14.02s" xml:space="preserve">    |     path: 'config.json'</text>
+  <text class="l quote" x="22" y="428" style="animation-delay:14.10s" xml:space="preserve">    |   }</text>
+  <text class="l dim" x="22" y="447" style="animation-delay:14.45s" xml:space="preserve">  network: on (on Linux, --offline runs the checks without it)</text>
+  <text class="l comment" x="22" y="475" style="animation-delay:17.45s" xml:space="preserve"># Why it failed: the config file was never committed.</text>
+  <text class="l cmd" x="22" y="494" style="animation-delay:18.65s" xml:space="preserve"><tspan class="prompt">$ </tspan><tspan class="cmd">git status --short config.json</tspan></text>
+  <text class="l untracked" x="22" y="513" style="animation-delay:19.15s" xml:space="preserve">?? config.json</text>
+  <line x1="0" y1="538" x2="920" y2="538" stroke="#30363d"/>
+  <text class="foot" x="22" y="558">Sample repository made by docs/clip/make-clip.mjs. Output is from a real run; a long stack trace is trimmed to its last lines (…).</text>
+</svg>

@@ -9,6 +9,13 @@ bash, and has no dependencies. It is source-available under FSL-1.1-MIT, not
 open source; see [License](#license). The picture version of this page is
 [README.html](README.html).
 
+![A sample terminal session: an agent's test passes on its own machine, it hands over a receipt that says PASS, and receipt-check answers REFUTED because the file the test needed was never committed.](docs/clip/refuted.svg)
+
+That's a sample run, about 20 seconds long. The test passes on the agent's
+machine only because of a file that was never committed, so the rerun from
+the commit fails. `node docs/clip/make-clip.mjs` rebuilds the clip from a
+real run.
+
 ## Why
 
 When a coding agent finishes, it reports something like:
@@ -27,13 +34,15 @@ when a rerun that nothing outside the commit can touch produces the same
 evidence. When evidence is missing or can't be read, the answer is
 INCOMPLETE, never VERIFIED.
 
-`receipt-checker` is one of the source-available reliability primitives from
-[Agent Hub](https://www.keegan.ai/workspace/) (a 5-agent local control plane with
-82 shared tools and 8,738 tests), alongside
-[`compaction-guard`](https://github.com/keeganarko/compaction-guard) (SHA-256
-transcript verification before context compaction) and
-[`model-lab`](https://github.com/keeganarko/model-lab) (local LLM
-interpretability and activation steering).
+I built it for [Agent Hub](https://www.keegan.ai/workspace/), where I run five
+coding agents on one project, because "done" from an agent kept meaning
+"done on its machine". Its siblings:
+[`agent-delivery-queue`](https://github.com/keeganarko/agent-delivery-queue)
+(agent messages wait while a person is typing),
+[`compaction-guard`](https://github.com/keeganarko/compaction-guard) (a
+hash-checked copy of a Claude Code conversation before it compacts) and
+[`model-lab`](https://github.com/keeganarko/model-lab) (looking inside small
+open models).
 
 ## How it works
 
